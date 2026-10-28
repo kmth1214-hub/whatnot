@@ -50,3 +50,6 @@ venv/
 !/downloads/CatalogExactDimensions.csv
 !/downloads/CatalogSupplyRanges.csv
 !/downloads/SharePoint_CatalogDimensions.xlsx
+
+# Public workflow explanation, generated from the standalone HTML demo
+!/docs/ocr-sharepoint-workflow.pdf
