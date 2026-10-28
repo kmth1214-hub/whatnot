@@ -44,3 +44,9 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# Explicit, checked catalog download artifacts
+!/downloads/sharepoint_catalog_dimensions.zip
+!/downloads/CatalogExactDimensions.csv
+!/downloads/CatalogSupplyRanges.csv
+!/downloads/SharePoint_CatalogDimensions.xlsx

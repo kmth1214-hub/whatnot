@@ -89,10 +89,16 @@ python pdf_extraction/catalog_dimension_csv/finalize_package.py
 
 원본 파일명·페이지·좌표는 별도 출처 기록에 두고, PA 실행용 JSON에는 필요한 업무값과 처리 상태를 전달하는 구조입니다.
 
+## 카탈로그 기준표 다운로드
+
+클라우드 아티팩트 다운로드가 실패하면 [다운로드 안내](downloads/README.md)에서 GitHub 파일을 받을 수 있습니다.
+검사한 카탈로그 배포 파일만 `downloads/`에 두며, 비공개 발주 추출 결과는 포함하지 않습니다.
+
 ## 보존 및 공개 범위
 
 기존 작업 폴더의 파일은 유지하고 소스의 복사본만 이 저장소에 모았습니다.
 원본 PDF, 고객 발주 데이터, OCR 결과 JSON, CSV/Excel 생성물, 모델 파일, API 키, 계정 키와 환경변수 값은 포함하지 않았습니다.
+카탈로그 기준표 다운로드를 위한 명시적 예외 파일은 `downloads/`에 별도로 관리합니다.
 환경에 종속된 절대 입력 경로는 로컬 입력 경로 옵션으로 바꿨습니다.
 
 자세한 소스 반입 범위는 [docs/SOURCE_IMPORT.md](docs/SOURCE_IMPORT.md)를 참고하세요.
