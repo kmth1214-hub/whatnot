@@ -1,0 +1,46 @@
+# Local credentials and environment values
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+.aws/
+.azure/
+.gcp/
+
+# Private input documents and extraction results
+/private/
+/attachments/
+**/results/
+**/deliverables/
+**/raw_ocr/
+**/validation_images/
+**/catalog_evidence/
+**/tools/tessdata*/
+*.traineddata
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.zip
+*.xlsx
+*.csv
+*.jsonl
+*.log
+checksums.json
+progress.log
+
+# Python/editor state
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.idea/
+.vscode/

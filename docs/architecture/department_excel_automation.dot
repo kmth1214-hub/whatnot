@@ -1,0 +1,49 @@
+digraph Architecture {
+  graph [rankdir=TB, bgcolor="#FFFFFF", pad="0.3", nodesep="0.35", ranksep="0.5", fontname="Noto Sans CJK KR", fontsize=19, label="부서별 엑셀 자동 작성 — 권장 아키텍처·처리 흐름 (설계안)", labelloc=t, compound=true];
+  node [shape=box, style="rounded,filled", fontname="Noto Sans CJK KR", fontsize=12, margin="0.15,0.1", fillcolor="#F1F7FF", color="#5E83B1", fontcolor="#16365E"];
+  edge [fontname="Noto Sans CJK KR", fontsize=10, color="#6D7C8F", fontcolor="#45556A", arrowsize=.7];
+
+  subgraph cluster_settings {
+    label="① 담당자가 관리하는 SharePoint 설정"; color="#C7D9F4"; style="rounded"; fontsize=15;
+    owner [label="부서 담당자\n기본 목록·엑셀 편집", fillcolor="#E8F1FF"];
+    rules [shape=cylinder,label="수치·대응 기준표\n품목 · 조건 · 단위 · 적용값 · 버전",fillcolor="#E8F1FF"];
+    mapping [shape=cylinder,label="셀 매핑 목록\n부서 · 템플릿 · 항목 · 시트 · 셀",fillcolor="#E8F1FF"];
+    template [shape=cylinder,label="부서별 엑셀 템플릿\n문서 라이브러리",fillcolor="#E8F1FF"];
+    owner -> rules; owner -> mapping; owner -> template;
+    {rank=same; rules;mapping;template;}
+  }
+  subgraph cluster_run {
+    label="② 문서 접수와 자동 처리 — Power Automate";color="#D6E2F1";style="rounded";fontsize=15;
+    upload [label="PDF 업로드 · 부서 선택"];
+    input [shape=cylinder,label="SharePoint 접수 라이브러리"];
+    start [label="PA 흐름 시작 · 작업번호 생성"];
+    load [label="부서 설정 조회\n기준·매핑·템플릿 버전 고정"];
+    ocr [label="HTTP → 추출 API\n텍스트 추출 또는 OCR\n항목·단위 JSON 정규화"];
+    validate [label="HTTP → 검증 API\n수치 범위·대응값·필수 항목 검사"];
+    check [shape=diamond,label="필수 조건 충족?\n미확정·중복·누락 없음",margin=.04];
+    upload -> input -> start -> load -> ocr -> validate -> check;
+  }
+  subgraph cluster_review {
+    label="③ 확인이 필요한 항목";color="#E8D3A5";style="rounded";fontsize=15;
+    review [shape=cylinder,label="SharePoint 검토 목록\n원래 값 · 후보 · 확인 사유",fillcolor="#FFF4DB",color="#C08A26",fontcolor="#6B4D12"];
+    edit [label="담당자가 값 확인·보완\n건별 수정 또는 공통 기준표 수정",fillcolor="#FFF4DB",color="#C08A26",fontcolor="#6B4D12"];
+    reload [label="수정값·설정 버전 다시 조회\n기존 추출 결과 재사용",fillcolor="#FFF4DB",color="#C08A26",fontcolor="#6B4D12"];
+    review -> edit -> reload;
+  }
+  subgraph cluster_delivery {
+    label="④ 엑셀 생성과 전달";color="#B8DBCD";style="rounded";fontsize=15;
+    copy [label="선택된 템플릿 복사본 생성",fillcolor="#E7F5EF",color="#328368"];
+    write [label="Office Scripts 실행\n셀 매핑에 따라 값 입력",fillcolor="#E7F5EF",color="#328368"];
+    output [shape=cylinder,label="SharePoint 결과 라이브러리\n완성 엑셀 저장",fillcolor="#E7F5EF",color="#328368"];
+    send [label="PA 메일 커넥터\n파일 첨부 또는 링크 발송",fillcolor="#E7F5EF",color="#328368"];
+    download [label="결과 링크로 다운로드",fillcolor="#E7F5EF",color="#328368"];
+    copy -> write -> output; output -> send; output -> download;
+    {rank=same;send;download;}
+  }
+  audit [shape=cylinder,label="별도 처리·검토 기록\n작업번호 · 적용 버전\n원본 출처 · 변경 이력",fillcolor="#F4F3F9",color="#9B94B3"];
+  rules -> load [style=dashed]; mapping -> load [style=dashed];template -> load [style=dashed];
+  check -> copy [label="충족",color="#328368"];
+  check -> review [label="확인 필요",color="#C08A26"];
+  reload -> validate [label="재검증",constraint=false,color="#C08A26"];
+  review -> audit [style=dashed,constraint=false];output -> audit [style=dashed];
+}

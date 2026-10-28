@@ -1,0 +1,59 @@
+flowchart TB
+    subgraph SETTINGS["① 담당자가 관리하는 SharePoint 설정"]
+        OWNER["부서 담당자<br/>기본 목록·엑셀 편집"]
+        RULES[("수치·대응 기준표<br/>품목 · 조건 · 단위 · 적용값 · 버전")]
+        MAP[("셀 매핑 목록<br/>부서 · 템플릿 · 항목 · 시트 · 셀")]
+        TEMPLATE[("부서별 엑셀 템플릿<br/>문서 라이브러리")]
+        OWNER --> RULES
+        OWNER --> MAP
+        OWNER --> TEMPLATE
+    end
+
+    subgraph RUN["② 문서 접수와 자동 처리 — Power Automate"]
+        UPLOAD["PDF 업로드<br/>부서 선택"]
+        INPUT[("SharePoint 접수 라이브러리")]
+        START["PA 흐름 시작<br/>작업번호 생성"]
+        LOAD["부서 설정 조회<br/>사용할 기준·매핑·템플릿 버전 고정"]
+        OCR["HTTP → 추출 API<br/>텍스트 추출 또는 OCR<br/>항목·단위 JSON 정규화"]
+        VALIDATE["HTTP → 검증 API<br/>수치 범위·대응값·필수 항목 검사"]
+        CHECK{"필수 조건 충족?<br/>미확정·중복·누락 없음"}
+        UPLOAD --> INPUT --> START --> LOAD --> OCR --> VALIDATE --> CHECK
+    end
+
+    subgraph REVIEW["③ 확인이 필요한 항목"]
+        QUEUE[("SharePoint 검토 목록<br/>원래 값 · 후보 · 확인 사유")]
+        EDIT["담당자가 값 확인·보완<br/>건별 수정 또는 공통 기준표 수정"]
+        RELOAD["수정값·설정 버전 다시 조회<br/>기존 추출 결과 재사용"]
+        QUEUE --> EDIT --> RELOAD
+    end
+
+    subgraph DELIVERY["④ 엑셀 생성과 전달"]
+        COPY["선택된 템플릿 복사본 생성"]
+        WRITE["Office Scripts 실행<br/>셀 매핑에 따라 값 입력"]
+        OUTPUT[("SharePoint 결과 라이브러리<br/>완성 엑셀 저장")]
+        SEND["PA 메일 커넥터<br/>파일 첨부 또는 링크 발송"]
+        DOWNLOAD["필요 시 결과 링크로 다운로드"]
+        COPY --> WRITE --> OUTPUT
+        OUTPUT --> SEND
+        OUTPUT --> DOWNLOAD
+    end
+
+    RULES -.-> LOAD
+    MAP -.-> LOAD
+    TEMPLATE -.-> LOAD
+    CHECK -->|충족| COPY
+    CHECK -->|확인 필요| QUEUE
+    RELOAD -->|재검증| VALIDATE
+
+    AUDIT[("별도 처리·검토 기록<br/>작업번호 · 적용 버전 · 원본 출처 · 변경 이력")]
+    QUEUE -.-> AUDIT
+    OUTPUT -.-> AUDIT
+
+    classDef setting fill:#e8f1ff,stroke:#3b6cb7,color:#16365e;
+    classDef process fill:#f1f7ff,stroke:#5e83b1,color:#16365e;
+    classDef review fill:#fff4db,stroke:#c08a26,color:#6b4d12;
+    classDef delivery fill:#e7f5ef,stroke:#328368,color:#205443;
+    class RULES,MAP,TEMPLATE,OWNER setting;
+    class INPUT,START,LOAD,OCR,VALIDATE,CHECK,UPLOAD process;
+    class QUEUE,EDIT,RELOAD review;
+    class COPY,WRITE,OUTPUT,SEND,DOWNLOAD delivery;
